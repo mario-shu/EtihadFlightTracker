@@ -1,0 +1,133 @@
+{
+  "targetFlight": {
+    "journeyType": "multicity",
+    "passengers": {
+      "adults": 3,
+      "children": 1,
+      "infants": 0
+    },
+    "cabinClass": "Economy",
+    "fareCategory": "Value",
+    "valueFareUpgrade": {
+      "enabled": true,
+      "leg1UpgradeTwd": 2370,
+      "leg2UpgradeTwd": 2963,
+      "totalUpgradeTwd": 5333,
+      "description": "去程升等 Value (+NT$2,370) + 回程升等 Value (+NT$2,963) = 4人總價差 +NT$5,333"
+    },
+    "baselinePriceTwd": 133550,
+    "targetPriceThresholdTwd": 128000,
+    "legs": [
+      {
+        "legIndex": 1,
+        "type": "去程",
+        "date": "2027-07-01",
+        "dateLabel": "2027年07月01日 (星期四)",
+        "origin": "TPE",
+        "originName": "台北桃園機場",
+        "destination": "LHR",
+        "destinationName": "倫敦希斯羅機場",
+        "totalDuration": "18 小時 20 分鐘",
+        "segments": [
+          {
+            "segmentIndex": 1,
+            "flightNumber": "EY 899",
+            "airline": "Etihad Airways",
+            "aircraft": "Boeing 787-10",
+            "originCode": "TPE",
+            "originName": "台北桃園機場",
+            "originTerminal": "航站樓 2",
+            "departureTime": "19:40",
+            "departureDate": "7月1日",
+            "destinationCode": "AUH",
+            "destinationName": "扎耶德國際機場 (阿布達比)",
+            "destinationTerminal": "航站樓 A",
+            "arrivalTime": "00:55",
+            "arrivalDate": "7月2日",
+            "duration": "9 小時 15 分鐘"
+          },
+          {
+            "segmentIndex": 2,
+            "flightNumber": "EY 61",
+            "airline": "Etihad Airways",
+            "aircraft": "Airbus A380",
+            "originCode": "AUH",
+            "originName": "扎耶德國際機場 (阿布達比)",
+            "originTerminal": "航站樓 A",
+            "departureTime": "02:20",
+            "departureDate": "7月2日",
+            "destinationCode": "LHR",
+            "destinationName": "倫敦希斯羅機場",
+            "destinationTerminal": "航站樓 4",
+            "arrivalTime": "07:00",
+            "arrivalDate": "7月2日",
+            "duration": "7 小時 40 分鐘"
+          }
+        ],
+        "layover": {
+          "airport": "扎耶德國際機場, AUH (航站樓 A)",
+          "duration": "1 小時 25 分鐘",
+          "note": "快速中轉"
+        }
+      },
+      {
+        "legIndex": 2,
+        "type": "回程",
+        "date": "2027-07-09",
+        "dateLabel": "2027年07月09日 (星期五)",
+        "origin": "CDG",
+        "originName": "巴黎戴高樂機場",
+        "destination": "TPE",
+        "destinationName": "台北桃園機場",
+        "totalDuration": "30 小時 10 分鐘",
+        "segments": [
+          {
+            "segmentIndex": 1,
+            "flightNumber": "EY 34",
+            "airline": "Etihad Airways",
+            "aircraft": "Boeing 787-9",
+            "originCode": "CDG",
+            "originName": "巴黎戴高樂機場",
+            "originTerminal": "航站樓 1",
+            "departureTime": "21:50",
+            "departureDate": "7月9日",
+            "destinationCode": "AUH",
+            "destinationName": "扎耶德國際機場 (阿布達比)",
+            "destinationTerminal": "航站樓 A",
+            "arrivalTime": "06:30",
+            "arrivalDate": "7月10日",
+            "duration": "6 小時 40 分鐘"
+          },
+          {
+            "segmentIndex": 2,
+            "flightNumber": "EY 898",
+            "airline": "Etihad Airways",
+            "aircraft": "Boeing 787-10",
+            "originCode": "AUH",
+            "originName": "扎耶德國際機場 (阿布達比)",
+            "originTerminal": "航站樓 A",
+            "departureTime": "21:20",
+            "departureDate": "7月10日",
+            "destinationCode": "TPE",
+            "destinationName": "台北桃園機場",
+            "destinationTerminal": "航站樓 2",
+            "arrivalTime": "10:00",
+            "arrivalDate": "7月11日 (+2天)",
+            "duration": "8 小時 40 分鐘"
+          }
+        ],
+        "layover": {
+          "airport": "扎耶德國際機場, AUH (航站樓 A)",
+          "duration": "14 小時 50 分鐘",
+          "note": "阿布達比日間過境停留"
+        }
+      }
+    ]
+  },
+  "settings": {
+    "port": 3000,
+    "headless": true,
+    "timeoutMs": 60000,
+    "currency": "TWD"
+  }
+}

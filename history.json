@@ -1,0 +1,241 @@
+[
+  {
+    "timestamp": "2026-09-11T09:00:00+08:00",
+    "dateStr": "2026-09-11",
+    "timeStr": "09:00",
+    "totalPriceTwd": 119541,
+    "currency": "TWD",
+    "adultCount": 3,
+    "childCount": 1,
+    "averagePerPerson": 29885.25,
+    "cabinClass": "Economy",
+    "fareCategory": "Value",
+    "keyMatched": {
+      "outbound": [
+        "EY 899",
+        "EY 61"
+      ],
+      "inbound": [
+        "EY 34",
+        "EY 898"
+      ]
+    },
+    "leg1": {
+      "route": "TPE -> LHR",
+      "departure": "19:40",
+      "arrival": "07:00 (+1天)",
+      "date": "2027-07-01",
+      "transit": "1次中轉 1小時25分鐘"
+    },
+    "leg2": {
+      "route": "CDG -> TPE",
+      "departure": "21:50",
+      "arrival": "10:00 (+2天)",
+      "date": "2027-07-09",
+      "transit": "1次中轉 14小時50分鐘"
+    },
+    "equipmentCheck": {
+      "isA380Confirmed": true,
+      "flagshipFlight": "EY 61",
+      "aircraft": "Airbus A380"
+    },
+    "status": "Verified",
+    "note": "使用者 9/11 真實查詢紀錄 (波段歷史低點)"
+  },
+  {
+    "timestamp": "2026-11-02T11:03:00+08:00",
+    "dateStr": "2026-11-02",
+    "timeStr": "11:03",
+    "totalPriceTwd": 133550,
+    "currency": "TWD",
+    "adultCount": 3,
+    "childCount": 1,
+    "averagePerPerson": 33387.5,
+    "cabinClass": "Economy",
+    "fareCategory": "Value",
+    "keyMatched": {
+      "outbound": [
+        "EY 899",
+        "EY 61"
+      ],
+      "inbound": [
+        "EY 34",
+        "EY 898"
+      ]
+    },
+    "leg1": {
+      "route": "TPE -> LHR",
+      "departure": "19:40",
+      "arrival": "07:00 (+1天)",
+      "date": "2027-07-01",
+      "transit": "1次中轉 1小時25分鐘"
+    },
+    "leg2": {
+      "route": "CDG -> TPE",
+      "departure": "21:50",
+      "arrival": "10:00 (+2天)",
+      "date": "2027-07-09",
+      "transit": "1次中轉 14小時50分鐘"
+    },
+    "leg1Details": {
+      "legIndex": 1,
+      "type": "去程",
+      "date": "2027-07-01",
+      "dateLabel": "2027年07月01日 (星期四)",
+      "origin": "TPE",
+      "originName": "台北桃園機場",
+      "destination": "LHR",
+      "destinationName": "倫敦希斯羅機場",
+      "totalDuration": "18 小時 20 分鐘",
+      "segments": [
+        {
+          "segmentIndex": 1,
+          "flightNumber": "EY 899",
+          "airline": "Etihad Airways",
+          "aircraft": "Boeing 787-10",
+          "originCode": "TPE",
+          "originName": "台北桃園機場",
+          "originTerminal": "航站樓 2",
+          "departureTime": "19:40",
+          "departureDate": "7月1日",
+          "destinationCode": "AUH",
+          "destinationName": "扎耶德國際機場 (阿布達比)",
+          "destinationTerminal": "航站樓 A",
+          "arrivalTime": "00:55",
+          "arrivalDate": "7月2日",
+          "duration": "9 小時 15 分鐘"
+        },
+        {
+          "segmentIndex": 2,
+          "flightNumber": "EY 61",
+          "airline": "Etihad Airways",
+          "aircraft": "Airbus A380",
+          "originCode": "AUH",
+          "originName": "扎耶德國際機場 (阿布達比)",
+          "originTerminal": "航站樓 A",
+          "departureTime": "02:20",
+          "departureDate": "7月2日",
+          "destinationCode": "LHR",
+          "destinationName": "倫敦希斯羅機場",
+          "destinationTerminal": "航站樓 4",
+          "arrivalTime": "07:00",
+          "arrivalDate": "7月2日",
+          "duration": "7 小時 40 分鐘"
+        }
+      ],
+      "layover": {
+        "airport": "扎耶德國際機場, AUH (航站樓 A)",
+        "duration": "1 小時 25 分鐘",
+        "note": "快速中轉"
+      }
+    },
+    "leg2Details": {
+      "legIndex": 2,
+      "type": "回程",
+      "date": "2027-07-09",
+      "dateLabel": "2027年07月09日 (星期五)",
+      "origin": "CDG",
+      "originName": "巴黎戴高樂機場",
+      "destination": "TPE",
+      "destinationName": "台北桃園機場",
+      "totalDuration": "30 小時 10 分鐘",
+      "segments": [
+        {
+          "segmentIndex": 1,
+          "flightNumber": "EY 34",
+          "airline": "Etihad Airways",
+          "aircraft": "Boeing 787-9",
+          "originCode": "CDG",
+          "originName": "巴黎戴高樂機場",
+          "originTerminal": "航站樓 1",
+          "departureTime": "21:50",
+          "departureDate": "7月9日",
+          "destinationCode": "AUH",
+          "destinationName": "扎耶德國際機場 (阿布達比)",
+          "destinationTerminal": "航站樓 A",
+          "arrivalTime": "06:30",
+          "arrivalDate": "7月10日",
+          "duration": "6 小時 40 分鐘"
+        },
+        {
+          "segmentIndex": 2,
+          "flightNumber": "EY 898",
+          "airline": "Etihad Airways",
+          "aircraft": "Boeing 787-10",
+          "originCode": "AUH",
+          "originName": "扎耶德國際機場 (阿布達比)",
+          "originTerminal": "航站樓 A",
+          "departureTime": "21:20",
+          "departureDate": "7月10日",
+          "destinationCode": "TPE",
+          "destinationName": "台北桃園機場",
+          "destinationTerminal": "航站樓 2",
+          "arrivalTime": "10:00",
+          "arrivalDate": "7月11日 (+2天)",
+          "duration": "8 小時 40 分鐘"
+        }
+      ],
+      "layover": {
+        "airport": "扎耶德國際機場, AUH (航站樓 A)",
+        "duration": "14 小時 50 分鐘",
+        "note": "阿布達比日間過境停留"
+      }
+    },
+    "equipmentCheck": {
+      "isA380Confirmed": true,
+      "flagshipFlight": "EY 61",
+      "aircraft": "Airbus A380",
+      "status": "CONFIRMED_A380",
+      "statusLabel": "已即時比對確認：執飛機型為 A380 雙層巨無霸旗艦客機"
+    },
+    "scheduleChanges": [],
+    "status": "Verified",
+    "note": "官網基準比價 (鎖定 Key: EY899+EY61 / EY34+EY898)"
+  },
+  {
+    "timestamp": "2026-11-02T13:31:18+08:00",
+    "dateStr": "2026-11-02",
+    "timeStr": "13:31",
+    "totalPriceTwd": 133550,
+    "basicPriceTwd": 128217,
+    "fareUpgradeTwd": 5333,
+    "currency": "TWD",
+    "adultCount": 3,
+    "childCount": 1,
+    "averagePerPerson": 33387.5,
+    "cabinClass": "Economy",
+    "fareCategory": "Value",
+    "keyMatched": {
+      "outbound": [
+        "EY 899",
+        "EY 61"
+      ],
+      "inbound": [
+        "EY 34",
+        "EY 898"
+      ]
+    },
+    "leg1": {
+      "route": "TPE -> LHR",
+      "departure": "19:40",
+      "arrival": "07:00 (+1天)",
+      "date": "2027-07-01",
+      "transit": "1次中轉 1小時25分鐘"
+    },
+    "leg2": {
+      "route": "CDG -> TPE",
+      "departure": "21:50",
+      "arrival": "10:00 (+2天)",
+      "date": "2027-07-09",
+      "transit": "1次中轉"
+    },
+    "equipmentCheck": {
+      "isA380Confirmed": true,
+      "flagshipFlight": "EY 61",
+      "aircraft": "Airbus A380"
+    },
+    "status": "Verified",
+    "source": "Google Flights (Live Etihad Direct)",
+    "note": "系統即時抓取 (Basic NT$ 128,217 + Value 升等差額 NT$ 5,333 = Value 總價 NT$ 133,550)"
+  }
+]
