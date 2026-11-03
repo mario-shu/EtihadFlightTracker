@@ -12,10 +12,11 @@ echo.
 schtasks /Create /TN "EtihadFlightTrackerDaily" /TR "\"%~dp0run_daily.bat\"" /SC DAILY /ST 09:00 /F
 
 if %ERRORLEVEL% EQU 0 (
+    powershell -NoProfile -Command "$t = Get-ScheduledTask -TaskName 'EtihadFlightTrackerDaily'; $s = $t.Settings; $s.StartWhenAvailable = $true; $s.WakeToRun = $true; Set-ScheduledTask -TaskName 'EtihadFlightTrackerDaily' -Settings $s" >nul 2>&1
     echo.
     echo ========================================================
     echo [SUCCESS] Task created successfully: EtihadFlightTrackerDaily
-    echo [Schedule] Runs every day at 09:00 AM in the background
+    echo [Schedule] Runs every day at 09:00 AM (Auto-catch-up after sleep enabled)
     echo [Target] Updates d:\Work\EtihadFlightTracker\index.html
     echo ========================================================
     echo.

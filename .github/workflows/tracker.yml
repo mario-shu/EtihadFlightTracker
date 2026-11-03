@@ -47,3 +47,4 @@ jobs:
             git commit -m "chore: auto-update flight prices [skip ci]"
             git push
           fi
+
