@@ -220,30 +220,16 @@ function generateHtmlReport() {
 
       </div>
 
-      <!-- 控制按鈕群 (即時比價更新 & 官網直達) -->
+      <!-- 控制按鈕群 (官網比價預訂) -->
       <div class="flex items-center gap-3 flex-wrap">
-        
-        <!-- 🔄 手動即時更新按鈕 -->
-        <button id="updateBtn" onclick="triggerManualUpdate()"
-                class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 active:bg-slate-900 text-slate-200 font-semibold text-sm border border-slate-600/80 shadow-md transition-all flex items-center gap-2 group">
-          <svg id="updateIcon" class="w-4 h-4 text-amber-400 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-          </svg>
-          <span id="updateText">立即手動比價</span>
-        </button>
-
         <!-- 官網訂票深層連結 -->
         <a href="${deepLink}" target="_blank" rel="noopener noreferrer" 
            class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center gap-2">
           <span>前往官網比價預訂</span>
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
         </a>
-
       </div>
     </header>
-
-    <!-- 更新狀態浮動通知列 (隱藏於預設狀態) -->
-    <div id="statusAlert" class="hidden rounded-xl p-3.5 text-sm font-semibold flex items-center justify-between transition-all"></div>
 
     <!-- KPI 統計摘要卡片群 -->
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -649,58 +635,6 @@ function generateHtmlReport() {
         }
       }
     });
-
-    // 手動更新按鈕非同步邏輯
-    async function triggerManualUpdate() {
-      const btn = document.getElementById('updateBtn');
-      const icon = document.getElementById('updateIcon');
-      const text = document.getElementById('updateText');
-      const alertBox = document.getElementById('statusAlert');
-
-      // 檢查是否透過 localhost 微服務開啟
-      const isHttp = window.location.protocol.startsWith('http');
-
-      btn.disabled = true;
-      icon.classList.add('animate-spin-fast');
-      text.innerText = '正在連線比價中...';
-
-      alertBox.className = 'rounded-xl p-3.5 text-xs font-semibold flex items-center justify-between transition-all bg-amber-500/10 border border-amber-500/30 text-amber-300';
-      alertBox.innerHTML = '<span>⏳ 正在連線阿提哈德官網查詢最新價格，約需 10~15 秒，請稍候...</span>';
-      alertBox.classList.remove('hidden');
-
-      if (!isHttp) {
-        // 若使用者是以 file:/// 方式開啟，給予貼心指引
-        setTimeout(() => {
-          alertBox.className = 'rounded-xl p-3.5 text-xs font-semibold flex items-center justify-between transition-all bg-blue-500/10 border border-blue-500/30 text-blue-300';
-          alertBox.innerHTML = '<span>💡 提示：目前為本機檔案模式。若要直接點按鈕更新，請執行 <code>start_server.bat</code>；或直接點擊 <code>run_daily.bat</code> 執行更新後按 F5 刷新！</span>';
-          btn.disabled = false;
-          icon.classList.remove('animate-spin-fast');
-          text.innerText = '立即手動比價';
-        }, 1200);
-        return;
-      }
-
-      try {
-        const response = await fetch('/api/update', { method: 'POST' });
-        const result = await response.json();
-        
-        if (result.success) {
-          alertBox.className = 'rounded-xl p-3.5 text-xs font-semibold flex items-center justify-between transition-all bg-emerald-500/10 border border-emerald-500/30 text-emerald-300';
-          alertBox.innerHTML = '<span>✅ 最新票價更新完成！頁面即將自動刷新最新數據...</span>';
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
-        } else {
-          throw new Error(result.error || '比價失敗');
-        }
-      } catch (err) {
-        alertBox.className = 'rounded-xl p-3.5 text-xs font-semibold flex items-center justify-between transition-all bg-rose-500/10 border border-rose-500/30 text-rose-300';
-        alertBox.innerHTML = '<span>❌ 更新失敗：' + err.message + '</span>';
-        btn.disabled = false;
-        icon.classList.remove('animate-spin-fast');
-        text.innerText = '重試比價';
-      }
-    }
   </script>
 </body>
 </html>`;
