@@ -1,16 +1,17 @@
 # 🏎️ 2027 英國法國 F1 家族之旅 • 阿提哈德機票價格追蹤雷達
 
-本工具為鎖定**2027 英國法國 F1 大獎賽家族之旅**之機票價格監控系統：
+本系統為鎖定 **2027 英國法國 F1 大獎賽家族之旅** 之雲端全自動機票監控雷達：
 * **去程**：台北 (TPE) ➔ 倫敦希斯羅 (LHR)，搭乘 EY 899 轉 EY 61 (Airbus A380 雙層旗艦客機)。
 * **回程**：巴黎戴高樂 (CDG) ➔ 台北 (TPE)，搭乘 EY 34 轉 EY 898 (阿布達比日間過境停留 14h 50m)。
 * **旅客陣容**：3 位成人 + 1 位兒童（家庭票）
-* **初始基準總價**：**NT$ 133,550**（歷史波段低點曾出現過 NT$ 119,541）
+* **監控艙等**：經濟艙 Value（含 Basic 即時票價 + Value 專案升等價差）
+* **線上即時儀表板**：[https://mario-shu.github.io/EtihadFlightTracker/](https://mario-shu.github.io/EtihadFlightTracker/)
 
 ---
 
 ## 📌 鎖定追蹤之航線與航班詳細資訊 (Primary Key 唯一鎖定機制)
 
-系統採用 **特定日期 ＋ 官方航班號碼** 作為唯一主鍵（Primary Key）進行精準比對，確保官網無論回傳多少轉機組合，都能百分之百鎖定目標航班並動態同步最新班表、機型與票價：
+系統採用 **特定日期 ＋ 官方航班號碼** 作為唯一主鍵（Primary Key）進行精準比對，確保無論搜尋結果回傳多少轉機組合，都能百分之百鎖定目標航班並動態同步最新班表、機型與票價：
 * **去程 Key**：`2027/07/01` + `[EY 899, EY 61]`
 * **回程 Key**：`2027/07/09` + `[EY 34, EY 898]`
 * **機型即時監控 (A380 Watch)**：即時驗證 EY 61 是否維持由 Airbus A380 雙層巨無霸執飛，若官網有換機型或班表微調，系統自動警示並同步網頁。
@@ -52,31 +53,29 @@
 ## 🚀 專案結構說明
 
 ```text
-d:\Work\EtihadFlightTracker/
-├── config.json            # 追蹤條件設定檔 (航線、班次號、起降時間、中轉時長、目標門檻)
+EtihadFlightTracker/
+├── .github/workflows/
+│   └── tracker.yml        # GitHub Actions 雲端排程 (每日 09:00、21:00 自動在雲端執行)
+├── config.json            # 追蹤條件設定檔 (航線、班次號、起降時間、中轉時長、目標門檻、Value 升等價差)
 ├── history.json           # 歷次抓取歷史紀錄 (JSON 資料庫，100% 真實數據)
-├── tracker.js             # 爬蟲與報價擷取主程式 (Playwright + 原生 Chrome)
+├── tracker.js             # 雲端自動抓取引擎 (Playwright + Google Flights API 攔截)
 ├── analyzer.js            # 趨勢分析與智慧下手購買建議引擎
-├── generateReport.js      # 自動生成視覺化 HTML 儀表板
-├── index.html             # 儀表板網頁 (含班次航段、走勢圖、最後更新時間與即時比價按鈕)
-├── server.js              # 輕量本機微服務 (支援網頁一鍵比價與即時刷新)
-├── start_server.bat       # 一鍵啟動微服務並自動開啟 http://localhost:3000
-├── run_daily.bat          # 每日定時執行批次檔 (供排程或隨時手動雙擊執行)
-├── setup_scheduler.bat    # 一鍵註冊 Windows 每日工作排程 (每天早上 09:00 自動執行)
-├── uninstall_scheduler.bat# 一鍵移除 Windows 工作排程
-└── package.json           # Node.js 專案依賴
+├── generateReport.js      # 自動生成視覺化 RWD HTML 儀表板
+├── index.html             # 儀表板網頁 (發布於 GitHub Pages，支援手機與電腦自適應響應式佈局)
+├── package.json           # Node.js 專案依賴
+└── README.md              # 專案架構說明文檔
 ```
 
 ---
 
-## 💡 如何使用
+## 💡 雲端運作與使用方式
 
-### 方式 1：啟動微服務模式（支援網頁點按鈕即時比價）
-1. 對 **`start_server.bat`** 點兩下。
-2. 系統會自動啟動後台服務並在瀏覽器開啟 `http://localhost:3000`。
-3. 頁面右上角有 **「🔄 立即手動比價」** 按鈕，點擊後會立即連線阿提哈德官網比價並原地動態更新數據與圖表！
-
-### 方式 2：設定每日自動排程（完全免動手）
-1. 對 **`setup_scheduler.bat`** 點右鍵選「以系統管理員身分執行」。
-2. 每天早上 09:00，Windows 會自動在背景完成抓取與圖表更新。
-3. 你隨時直接點開 **`index.html`** 即可查看已更新好的最新報表。
+1. **完全免開本機電腦**：
+   - GitHub Actions 每日台灣時間 **09:00** 與 **21:00** 自動在雲端啟動虛擬機進行最新票價抓取。
+   - 抓取完成後自動將最新數據寫入 `history.json` 並編譯 `index.html` 回存 GitHub。
+2. **手機外出隨身查閱**：
+   - 任何裝置（手機 / 平板 / PC）直接開啟：  
+     👉 [https://mario-shu.github.io/EtihadFlightTracker/](https://mario-shu.github.io/EtihadFlightTracker/)
+   - 在手機 Safari 或 Chrome 上點選「加入主畫面」，可將其作為桌面獨立 App 隨點隨看。
+3. **隨時手動即時刷新**：
+   - 前往 GitHub 儲存庫的 **Actions** 分頁 ➔ 點選 **Etihad Flight Daily Tracker** ➔ 點右側 **「Run workflow」**，約 40 秒即可手動完成最新價格更新。
