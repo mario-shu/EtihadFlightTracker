@@ -2,8 +2,9 @@ name: Etihad Flight Daily Tracker
 
 on:
   schedule:
-    # 每天執行兩次：台北時間 09:00 (UTC 01:00) 與 21:00 (UTC 13:00)
-    - cron: '0 1,13 * * *'
+    # 每天執行兩次：台北時間 09:15 (UTC 01:15) 與 21:15 (UTC 13:15)
+    # 避開整點尖峰負載以避免 GitHub Actions 排程嚴重延遲
+    - cron: '15 1,13 * * *'
   workflow_dispatch: # 允許在 GitHub 網頁上手動隨時點擊觸發
 
 permissions:

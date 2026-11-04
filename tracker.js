@@ -80,7 +80,14 @@ async function runTracker() {
     console.log(`3. 正在啟動瀏覽器載入即時結果 (${isCI ? 'CI Headless 模式' : 'Chrome 本機模式'})...`);
     browser = await chromium.launch(launchOptions);
 
-    const page = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
+    const context = await browser.newContext({
+      viewport: { width: 1440, height: 1100 },
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+      locale: 'zh-TW',
+      timezoneId: 'Asia/Taipei'
+    });
+
+    const page = await context.newPage();
 
     // 監聽並攔截 Google Flights 即時購物與票價數據
     page.on('response', async (res) => {
@@ -109,15 +116,34 @@ async function runTracker() {
       }
     });
 
-    await page.goto(searchUrl, { waitUntil: 'load', timeout: 60000 });
-    await page.waitForTimeout(6000);
+    console.log('   正在連線 Google Flights 查詢網址...');
+    await page.goto(searchUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
-    // 展開航班詳細資訊按鈕
+    // 輪詢等待價格出現 (同時支援 API 攔截與 DOM 渲染，最多等待 20 秒)
+    console.log('   正在等待 Google Flights 計算並載入即時航班票價...');
+    for (let i = 0; i < 20; i++) {
+      if (liveFetchedPrice) break;
+      await page.waitForTimeout(1000);
+      try {
+        const domPrice = await page.evaluate(() => {
+          const text = document.body ? document.body.innerText : '';
+          const match = text.match(/\$([0-9]{1,3},[0-9]{3})/);
+          return match ? parseInt(match[1].replace(/,/g, ''), 10) : null;
+        });
+        if (domPrice) {
+          liveFetchedPrice = domPrice;
+          console.log(`💎 [DOM 成功解析即時票價] NT$ ${liveFetchedPrice.toLocaleString()}`);
+          break;
+        }
+      } catch (e) { }
+    }
+
+    // 嘗試點擊展開航班詳細資訊按鈕
     try {
       const expandBtn = await page.$('button[aria-label*="航班詳細資料"], button[aria-label*="展開"], .pIav4d');
       if (expandBtn) {
         await expandBtn.click();
-        await page.waitForTimeout(2000);
+        await page.waitForTimeout(1500);
       }
     } catch (e) { }
 
@@ -125,18 +151,6 @@ async function runTracker() {
     const screenshotPath = path.join(__dirname, 'verify_0702.png');
     await page.screenshot({ path: screenshotPath, fullPage: true });
     console.log(`📸 現場即時截圖已更新至: ${screenshotPath}`);
-
-    // 若 API 未能及時取得，自頁面 DOM 解析價格
-    if (!liveFetchedPrice) {
-      liveFetchedPrice = await page.evaluate(() => {
-        const text = document.body ? document.body.innerText : '';
-        const match = text.match(/\$([0-9]{1,3},[0-9]{3})/);
-        return match ? parseInt(match[1].replace(/,/g, ''), 10) : null;
-      });
-      if (liveFetchedPrice) {
-        console.log(`💎 [DOM 成功解析即時票價] NT$ ${liveFetchedPrice.toLocaleString()}`);
-      }
-    }
 
     if (!liveFetchedPrice) {
       throw new Error('未能從 Google Flights 取得阿提哈德航班即時票價，為確保數據真實性，本輪追蹤終止。');
@@ -250,7 +264,13 @@ async function runTracker() {
 }
 
 if (require.main === module) {
-  runTracker();
+  runTracker().then(res => {
+    if (!res || !res.success) {
+      process.exit(1);
+    }
+  }).catch(() => {
+    process.exit(1);
+  });
 }
 
 module.exports = { runTracker };
