@@ -82,10 +82,19 @@ function generateHtmlReport() {
     return;
   }
 
-  // 整理 Chart.js 資料
-  const chartLabels = history.map(item => item.dateStr + ' ' + (item.timeStr || ''));
-  const chartPrices = history.map(item => item.totalPriceTwd);
-  const baselineLine = history.map(() => config.targetFlight.baselinePriceTwd);
+  // 整理 Chart.js 資料（支援「近期每日追蹤」與「完整歷史走勢」雙檢視切換）
+  const sortedHistory = [...history].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+  // 近期追蹤點（以 2026-11-01 正式定期追蹤啟動起算，避開早期單筆波段低點拉寬比例尺）
+  const recentHistory = sortedHistory.filter(item => new Date(item.timestamp) >= new Date('2026-11-01T00:00:00+08:00'));
+  const effectiveRecentHistory = recentHistory.length > 0 ? recentHistory : sortedHistory.slice(-10);
+
+  const allLabels = sortedHistory.map(item => item.dateStr + ' ' + (item.timeStr || ''));
+  const allPrices = sortedHistory.map(item => item.totalPriceTwd);
+  const allBaselines = sortedHistory.map(() => config.targetFlight.baselinePriceTwd);
+
+  const recentLabels = effectiveRecentHistory.map(item => item.dateStr + ' ' + (item.timeStr || ''));
+  const recentPrices = effectiveRecentHistory.map(item => item.totalPriceTwd);
+  const recentBaselines = effectiveRecentHistory.map(() => config.targetFlight.baselinePriceTwd);
 
   const latestRecord = analysis.latest || {};
   // 優先使用最新抓取並經 Key 比對之動態航段資料，無則 fallback 至 config
@@ -499,19 +508,38 @@ function generateHtmlReport() {
 
     <!-- 價格歷史走勢圖表 -->
     <section class="glass-card rounded-2xl p-6">
-      <div class="flex items-center justify-between mb-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <div>
-          <h3 class="text-xl font-bold text-slate-100">價格歷史波動走勢圖 (TWD)</h3>
-          <p class="text-sm text-slate-400">每日定時紀錄點與基準線比對</p>
-        </div>
-        <div class="flex items-center gap-4 text-sm font-semibold">
-          <div class="flex items-center gap-2 text-amber-400">
-            <span class="w-3.5 h-3.5 rounded-full bg-amber-400 inline-block"></span>
-            <span>實際總價</span>
+          <div class="flex items-center gap-2.5">
+            <h3 class="text-xl font-bold text-slate-100">價格歷史波動走勢圖 (TWD)</h3>
+            <span id="chartRangeBadge" class="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 font-semibold">
+              近期每日追蹤
+            </span>
           </div>
-          <div class="flex items-center gap-2 text-slate-300">
-            <span class="w-4 h-0.5 bg-slate-400 inline-block"></span>
-            <span>初始基準線 (133,550)</span>
+          <p class="text-sm text-slate-400 mt-0.5">每日定時紀錄點與基準線比對</p>
+        </div>
+        
+        <div class="flex items-center gap-3.5 flex-wrap">
+          <!-- 檢視模式切換器 -->
+          <div class="inline-flex p-1 bg-slate-800/90 rounded-xl border border-slate-700/80 text-xs font-semibold shadow-inner">
+            <button id="btnRecent" type="button" onclick="switchChartMode('recent')" class="px-3 py-1.5 rounded-lg transition-all bg-amber-500 text-slate-950 font-bold shadow-sm">
+              近期追蹤 (11/02起)
+            </button>
+            <button id="btnAll" type="button" onclick="switchChartMode('all')" class="px-3 py-1.5 rounded-lg transition-all text-slate-400 hover:text-slate-200">
+              全部紀錄 (含9/11低點)
+            </button>
+          </div>
+
+          <!-- 圖例標示 -->
+          <div class="hidden md:flex items-center gap-3.5 text-xs font-semibold">
+            <div class="flex items-center gap-1.5 text-amber-400">
+              <span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span>
+              <span>實際總價</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-slate-300">
+              <span class="w-3.5 h-0.5 bg-slate-400 inline-block"></span>
+              <span>初始基準線 (133,550)</span>
+            </div>
           </div>
         </div>
       </div>
@@ -569,18 +597,34 @@ function generateHtmlReport() {
   </div>
 
   <script>
-    // 渲染 Chart.js
+    // 渲染 Chart.js (支援近期追蹤與全部走勢切換)
+    const chartDataSets = {
+      recent: {
+        labels: ${JSON.stringify(recentLabels)},
+        prices: ${JSON.stringify(recentPrices)},
+        baselines: ${JSON.stringify(recentBaselines)},
+        badge: '近期每日追蹤'
+      },
+      all: {
+        labels: ${JSON.stringify(allLabels)},
+        prices: ${JSON.stringify(allPrices)},
+        baselines: ${JSON.stringify(allBaselines)},
+        badge: '全部紀錄 (含9/11低點)'
+      }
+    };
+
+    let currentMode = 'recent';
     const ctx = document.getElementById('priceChart').getContext('2d');
-    new Chart(ctx, {
+    const priceChart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: ${JSON.stringify(chartLabels)},
+        labels: chartDataSets.recent.labels,
         datasets: [
           {
             label: '總票價 (TWD)',
-            data: ${JSON.stringify(chartPrices)},
+            data: chartDataSets.recent.prices,
             borderColor: '#F59E0B',
-            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+            backgroundColor: 'rgba(245, 158, 11, 0.12)',
             fill: true,
             tension: 0.3,
             borderWidth: 3,
@@ -590,7 +634,7 @@ function generateHtmlReport() {
           },
           {
             label: '初始基準線 (NT$ 133,550)',
-            data: ${JSON.stringify(baselineLine)},
+            data: chartDataSets.recent.baselines,
             borderColor: '#64748B',
             borderDash: [5, 5],
             borderWidth: 2,
@@ -624,17 +668,45 @@ function generateHtmlReport() {
             ticks: { color: '#94A3B8', font: { size: 11 } }
           },
           y: {
+            beginAtZero: false,
             grid: { color: 'rgba(255, 255, 255, 0.05)' },
             ticks: {
               color: '#94A3B8',
               callback: function(value) {
-                return 'NT$ ' + (value / 1000) + 'k';
+                return 'NT$ ' + Number(value).toLocaleString();
               }
             }
           }
         }
       }
     });
+
+    function switchChartMode(mode) {
+      if (currentMode === mode) return;
+      currentMode = mode;
+      const target = chartDataSets[mode];
+      
+      priceChart.data.labels = target.labels;
+      priceChart.data.datasets[0].data = target.prices;
+      priceChart.data.datasets[1].data = target.baselines;
+      priceChart.update();
+
+      const btnRecent = document.getElementById('btnRecent');
+      const btnAll = document.getElementById('btnAll');
+      const badge = document.getElementById('chartRangeBadge');
+
+      const activeClass = 'px-3 py-1.5 rounded-lg transition-all bg-amber-500 text-slate-950 font-bold shadow-sm';
+      const inactiveClass = 'px-3 py-1.5 rounded-lg transition-all text-slate-400 hover:text-slate-200';
+
+      if (mode === 'recent') {
+        btnRecent.className = activeClass;
+        btnAll.className = inactiveClass;
+      } else {
+        btnAll.className = activeClass;
+        btnRecent.className = inactiveClass;
+      }
+      if (badge) badge.textContent = target.badge;
+    }
   </script>
 </body>
 </html>`;
