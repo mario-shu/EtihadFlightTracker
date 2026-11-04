@@ -82,7 +82,7 @@ function generateHtmlReport() {
     return;
   }
 
-  // 整理 Chart.js 資料（支援「近期每日追蹤」與「完整歷史走勢」雙檢視切換）
+  // 整理 Chart.js 資料（支援「近期每日追蹤」與「完整歷史走勢」雙檢視切換，包含平均線）
   const sortedHistory = [...history].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
   // 近期追蹤點（以 2026-11-01 正式定期追蹤啟動起算，避開早期單筆波段低點拉寬比例尺）
   const recentHistory = sortedHistory.filter(item => new Date(item.timestamp) >= new Date('2026-11-01T00:00:00+08:00'));
@@ -91,10 +91,14 @@ function generateHtmlReport() {
   const allLabels = sortedHistory.map(item => item.dateStr + ' ' + (item.timeStr || ''));
   const allPrices = sortedHistory.map(item => item.totalPriceTwd);
   const allBaselines = sortedHistory.map(() => config.targetFlight.baselinePriceTwd);
+  const allAvgPrice = Math.round(allPrices.reduce((a, b) => a + b, 0) / (allPrices.length || 1));
+  const allAverages = sortedHistory.map(() => allAvgPrice);
 
   const recentLabels = effectiveRecentHistory.map(item => item.dateStr + ' ' + (item.timeStr || ''));
   const recentPrices = effectiveRecentHistory.map(item => item.totalPriceTwd);
   const recentBaselines = effectiveRecentHistory.map(() => config.targetFlight.baselinePriceTwd);
+  const recentAvgPrice = Math.round(recentPrices.reduce((a, b) => a + b, 0) / (recentPrices.length || 1));
+  const recentAverages = effectiveRecentHistory.map(() => recentAvgPrice);
 
   const latestRecord = analysis.latest || {};
   // 優先使用最新抓取並經 Key 比對之動態航段資料，無則 fallback 至 config
@@ -531,19 +535,23 @@ function generateHtmlReport() {
           </div>
 
           <!-- 圖例標示 -->
-          <div class="hidden md:flex items-center gap-3.5 text-xs font-semibold">
+          <div class="hidden lg:flex items-center gap-3.5 text-xs font-semibold">
             <div class="flex items-center gap-1.5 text-amber-400">
               <span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span>
               <span>實際總價</span>
             </div>
+            <div class="flex items-center gap-1.5 text-sky-400">
+              <span class="w-3.5 h-0.5 bg-sky-400 inline-block border-t border-dashed border-sky-400"></span>
+              <span>追蹤平均線 (<span id="avgLegendText">NT$ ${recentAvgPrice.toLocaleString()}</span>)</span>
+            </div>
             <div class="flex items-center gap-1.5 text-slate-300">
-              <span class="w-3.5 h-0.5 bg-slate-400 inline-block"></span>
-              <span>初始基準線 (133,550)</span>
+              <span class="w-3.5 h-0.5 bg-slate-400 inline-block border-t border-dashed border-slate-400"></span>
+              <span>初始基準線 (${config.targetFlight.baselinePriceTwd.toLocaleString()})</span>
             </div>
           </div>
         </div>
       </div>
-      <div class="h-72 w-full">
+      <div class="h-72 w-full relative">
         <canvas id="priceChart"></canvas>
       </div>
     </section>
@@ -603,12 +611,16 @@ function generateHtmlReport() {
         labels: ${JSON.stringify(recentLabels)},
         prices: ${JSON.stringify(recentPrices)},
         baselines: ${JSON.stringify(recentBaselines)},
+        averages: ${JSON.stringify(recentAverages)},
+        avgPrice: ${recentAvgPrice},
         badge: '近期每日追蹤'
       },
       all: {
         labels: ${JSON.stringify(allLabels)},
         prices: ${JSON.stringify(allPrices)},
         baselines: ${JSON.stringify(allBaselines)},
+        averages: ${JSON.stringify(allAverages)},
+        avgPrice: ${allAvgPrice},
         badge: '全部紀錄 (含9/11低點)'
       }
     };
@@ -621,7 +633,7 @@ function generateHtmlReport() {
         labels: chartDataSets.recent.labels,
         datasets: [
           {
-            label: '總票價 (TWD)',
+            label: '實際總價 (TWD)',
             data: chartDataSets.recent.prices,
             borderColor: '#F59E0B',
             backgroundColor: 'rgba(245, 158, 11, 0.12)',
@@ -633,7 +645,16 @@ function generateHtmlReport() {
             pointHoverRadius: 8
           },
           {
-            label: '初始基準線 (NT$ 133,550)',
+            label: '追蹤平均線 (NT$ ' + chartDataSets.recent.avgPrice.toLocaleString() + ')',
+            data: chartDataSets.recent.averages,
+            borderColor: '#38BDF8',
+            borderDash: [4, 4],
+            borderWidth: 2,
+            pointRadius: 0,
+            fill: false
+          },
+          {
+            label: '初始基準線 (NT$ ${config.targetFlight.baselinePriceTwd.toLocaleString()})',
             data: chartDataSets.recent.baselines,
             borderColor: '#64748B',
             borderDash: [5, 5],
@@ -646,58 +667,116 @@ function generateHtmlReport() {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        interaction: {
+          mode: 'index',
+          intersect: false
+        },
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: '#0F172A',
-            titleColor: '#F8FAFC',
-            bodyColor: '#F8FAFC',
-            borderColor: '#334155',
-            borderWidth: 1,
-            padding: 12,
-            callbacks: {
-              label: function(context) {
-                if (context.datasetIndex !== 0) {
-                  return context.dataset.label + ': NT$ ' + context.parsed.y.toLocaleString();
-                }
-                return '總票價 (TWD): NT$ ' + context.parsed.y.toLocaleString();
-              },
-              afterLabel: function(context) {
-                if (context.datasetIndex !== 0) return null;
-                const dataIndex = context.dataIndex;
-                const currentPrices = chartDataSets[currentMode].prices;
-                const price = currentPrices[dataIndex];
-                
-                // 1. 較前日的增減 (金額 & 百分比)
-                let prevText = '較前日增減: - (首筆紀錄)';
-                if (dataIndex > 0) {
-                  const prevPrice = currentPrices[dataIndex - 1];
-                  const diffPrev = price - prevPrice;
-                  const pctPrev = Math.abs((diffPrev / prevPrice) * 100).toFixed(2);
-                  if (diffPrev > 0) {
-                    prevText = '較前日增減: ▲ +NT$ ' + diffPrev.toLocaleString() + ' (+' + pctPrev + '%)';
-                  } else if (diffPrev < 0) {
-                    prevText = '較前日增減: ▼ -NT$ ' + Math.abs(diffPrev).toLocaleString() + ' (-' + pctPrev + '%)';
-                  } else {
-                    prevText = '較前日增減: 持平 (0.00%)';
-                  }
-                }
-
-                // 2. 較目前為止的平均的增減 (金額 & 百分比)
-                const avg = Math.round(currentPrices.reduce((a, b) => a + b, 0) / currentPrices.length);
-                const diffAvg = price - avg;
-                const pctAvg = Math.abs((diffAvg / avg) * 100).toFixed(2);
-                let avgText = '';
-                if (diffAvg > 0) {
-                  avgText = '較目前為止平均: ▲ +NT$ ' + diffAvg.toLocaleString() + ' (+' + pctAvg + '%)';
-                } else if (diffAvg < 0) {
-                  avgText = '較目前為止平均: ▼ -NT$ ' + Math.abs(diffAvg).toLocaleString() + ' (-' + pctAvg + '%)';
-                } else {
-                  avgText = '較目前為止平均: 持平 (0.00%)';
-                }
-
-                return [prevText, avgText];
+            enabled: false,
+            external: function(context) {
+              const { chart, tooltip } = context;
+              let tooltipEl = document.getElementById('chartCustomTooltip');
+              if (!tooltipEl) {
+                tooltipEl = document.createElement('div');
+                tooltipEl.id = 'chartCustomTooltip';
+                tooltipEl.className = 'absolute pointer-events-none transition-all duration-100 z-30 rounded-xl p-3 shadow-2xl border border-slate-700/80 text-xs text-slate-200 min-w-[240px]';
+                tooltipEl.style.backgroundColor = 'rgba(15, 23, 42, 0.95)';
+                tooltipEl.style.backdropFilter = 'blur(10px)';
+                chart.canvas.parentNode.style.position = 'relative';
+                chart.canvas.parentNode.appendChild(tooltipEl);
               }
+
+              if (tooltip.opacity === 0) {
+                tooltipEl.style.opacity = '0';
+                return;
+              }
+
+              const dataIndex = tooltip.dataPoints[0].dataIndex;
+              const target = chartDataSets[currentMode];
+              const dateLabel = target.labels[dataIndex];
+              const price = target.prices[dataIndex];
+              const avg = target.avgPrice;
+              const baseline = target.baselines[dataIndex];
+
+              // 1. 較前日增減（增加用紅色，減少用綠色）
+              let prevHtml = '<span class="text-slate-400 font-semibold">- (首筆紀錄)</span>';
+              if (dataIndex > 0) {
+                const prevPrice = target.prices[dataIndex - 1];
+                const diffPrev = price - prevPrice;
+                const pctPrev = Math.abs((diffPrev / prevPrice) * 100).toFixed(2);
+                if (diffPrev > 0) {
+                  prevHtml = '<span class="text-rose-400 font-bold">▲ +NT$ ' + diffPrev.toLocaleString() + ' (+' + pctPrev + '%)</span>';
+                } else if (diffPrev < 0) {
+                  prevHtml = '<span class="text-emerald-400 font-bold">▼ -NT$ ' + Math.abs(diffPrev).toLocaleString() + ' (-' + pctPrev + '%)</span>';
+                } else {
+                  prevHtml = '<span class="text-slate-400 font-semibold">持平 (0.00%)</span>';
+                }
+              }
+
+              // 2. 較目前為止平均的增減（增加用紅色，減少用綠色）
+              const diffAvg = price - avg;
+              const pctAvg = Math.abs((diffAvg / avg) * 100).toFixed(2);
+              let avgHtml = '';
+              if (diffAvg > 0) {
+                avgHtml = '<span class="text-rose-400 font-bold">▲ +NT$ ' + diffAvg.toLocaleString() + ' (+' + pctAvg + '%)</span>';
+              } else if (diffAvg < 0) {
+                avgHtml = '<span class="text-emerald-400 font-bold">▼ -NT$ ' + Math.abs(diffAvg).toLocaleString() + ' (-' + pctAvg + '%)</span>';
+              } else {
+                avgHtml = '<span class="text-slate-400 font-semibold">持平 (0.00%)</span>';
+              }
+
+              tooltipEl.innerHTML = [
+                '<div class="font-bold text-slate-100 mb-2 pb-1.5 border-b border-slate-700/70 flex items-center justify-between gap-3">',
+                '  <span class="font-mono text-xs">📅 ' + dateLabel + '</span>',
+                '  <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 font-semibold">實際追蹤</span>',
+                '</div>',
+                '<div class="space-y-1.5">',
+                '  <div class="flex items-center justify-between gap-3">',
+                '    <span class="text-amber-400 font-bold flex items-center gap-1.5">',
+                '      <span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span>',
+                '      實際總價:',
+                '    </span>',
+                '    <span class="font-black text-amber-300 text-sm">NT$ ' + price.toLocaleString() + '</span>',
+                '  </div>',
+                '  <div class="flex items-center justify-between gap-3 text-slate-300">',
+                '    <span>較前日增減:</span>',
+                '    ' + prevHtml,
+                '  </div>',
+                '  <div class="flex items-center justify-between gap-3 text-slate-300">',
+                '    <span>較目前平均:</span>',
+                '    ' + avgHtml,
+                '  </div>',
+                '  <div class="pt-1.5 mt-1 border-t border-slate-800/80 flex items-center justify-between gap-3 text-slate-400 text-[11px]">',
+                '    <span class="flex items-center gap-1 text-sky-400">',
+                '      <span class="w-3 h-0.5 bg-sky-400 inline-block border-t border-dashed border-sky-400"></span>',
+                '      追蹤平均線:',
+                '    </span>',
+                '    <span class="font-mono text-sky-300 font-semibold">NT$ ' + avg.toLocaleString() + '</span>',
+                '  </div>',
+                '  <div class="flex items-center justify-between gap-3 text-slate-400 text-[11px]">',
+                '    <span class="flex items-center gap-1 text-slate-400">',
+                '      <span class="w-3 h-0.5 bg-slate-400 inline-block border-t border-dashed border-slate-400"></span>',
+                '      初始基準線:',
+                '    </span>',
+                '    <span class="font-mono text-slate-300">NT$ ' + baseline.toLocaleString() + '</span>',
+                '  </div>',
+                '</div>'
+              ].join('');
+
+              tooltipEl.style.opacity = '1';
+
+              // 邊界防溢出定位
+              const isRightSide = tooltip.caretX > (chart.width * 0.55);
+              if (isRightSide) {
+                tooltipEl.style.left = (tooltip.caretX - 12) + 'px';
+                tooltipEl.style.transform = 'translate(-100%, -50%)';
+              } else {
+                tooltipEl.style.left = (tooltip.caretX + 12) + 'px';
+                tooltipEl.style.transform = 'translate(0, -50%)';
+              }
+              tooltipEl.style.top = Math.max(16, Math.min(chart.height - 16, tooltip.caretY)) + 'px';
             }
           }
         },
@@ -727,12 +806,15 @@ function generateHtmlReport() {
       
       priceChart.data.labels = target.labels;
       priceChart.data.datasets[0].data = target.prices;
-      priceChart.data.datasets[1].data = target.baselines;
+      priceChart.data.datasets[1].data = target.averages;
+      priceChart.data.datasets[1].label = '追蹤平均線 (NT$ ' + target.avgPrice.toLocaleString() + ')';
+      priceChart.data.datasets[2].data = target.baselines;
       priceChart.update();
 
       const btnRecent = document.getElementById('btnRecent');
       const btnAll = document.getElementById('btnAll');
       const badge = document.getElementById('chartRangeBadge');
+      const avgLegend = document.getElementById('avgLegendText');
 
       const activeClass = 'px-3 py-1.5 rounded-lg transition-all bg-amber-500 text-slate-950 font-bold shadow-sm';
       const inactiveClass = 'px-3 py-1.5 rounded-lg transition-all text-slate-400 hover:text-slate-200';
@@ -745,6 +827,7 @@ function generateHtmlReport() {
         btnRecent.className = inactiveClass;
       }
       if (badge) badge.textContent = target.badge;
+      if (avgLegend) avgLegend.textContent = 'NT$ ' + target.avgPrice.toLocaleString();
     }
   </script>
 </body>
