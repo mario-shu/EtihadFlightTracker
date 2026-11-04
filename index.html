@@ -585,7 +585,46 @@
             padding: 12,
             callbacks: {
               label: function(context) {
-                return context.dataset.label + ': NT$ ' + context.parsed.y.toLocaleString();
+                if (context.datasetIndex !== 0) {
+                  return context.dataset.label + ': NT$ ' + context.parsed.y.toLocaleString();
+                }
+                return '總票價 (TWD): NT$ ' + context.parsed.y.toLocaleString();
+              },
+              afterLabel: function(context) {
+                if (context.datasetIndex !== 0) return null;
+                const dataIndex = context.dataIndex;
+                const currentPrices = chartDataSets[currentMode].prices;
+                const price = currentPrices[dataIndex];
+                
+                // 1. 較前日的增減 (金額 & 百分比)
+                let prevText = '較前日增減: - (首筆紀錄)';
+                if (dataIndex > 0) {
+                  const prevPrice = currentPrices[dataIndex - 1];
+                  const diffPrev = price - prevPrice;
+                  const pctPrev = Math.abs((diffPrev / prevPrice) * 100).toFixed(2);
+                  if (diffPrev > 0) {
+                    prevText = '較前日增減: ▲ +NT$ ' + diffPrev.toLocaleString() + ' (+' + pctPrev + '%)';
+                  } else if (diffPrev < 0) {
+                    prevText = '較前日增減: ▼ -NT$ ' + Math.abs(diffPrev).toLocaleString() + ' (-' + pctPrev + '%)';
+                  } else {
+                    prevText = '較前日增減: 持平 (0.00%)';
+                  }
+                }
+
+                // 2. 較目前為止的平均的增減 (金額 & 百分比)
+                const avg = Math.round(currentPrices.reduce((a, b) => a + b, 0) / currentPrices.length);
+                const diffAvg = price - avg;
+                const pctAvg = Math.abs((diffAvg / avg) * 100).toFixed(2);
+                let avgText = '';
+                if (diffAvg > 0) {
+                  avgText = '較目前為止平均: ▲ +NT$ ' + diffAvg.toLocaleString() + ' (+' + pctAvg + '%)';
+                } else if (diffAvg < 0) {
+                  avgText = '較目前為止平均: ▼ -NT$ ' + Math.abs(diffAvg).toLocaleString() + ' (-' + pctAvg + '%)';
+                } else {
+                  avgText = '較目前為止平均: 持平 (0.00%)';
+                }
+
+                return [prevText, avgText];
               }
             }
           }
