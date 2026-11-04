@@ -641,8 +641,9 @@ function generateHtmlReport() {
             tension: 0.3,
             borderWidth: 3,
             pointBackgroundColor: '#F59E0B',
-            pointRadius: 5,
-            pointHoverRadius: 8
+            pointRadius: 6,
+            pointHoverRadius: 9,
+            pointHitRadius: 12
           },
           {
             label: '追蹤平均線 (NT$ ' + chartDataSets.recent.avgPrice.toLocaleString() + ')',
@@ -651,6 +652,7 @@ function generateHtmlReport() {
             borderDash: [4, 4],
             borderWidth: 2,
             pointRadius: 0,
+            pointHitRadius: 0,
             fill: false
           },
           {
@@ -660,6 +662,7 @@ function generateHtmlReport() {
             borderDash: [5, 5],
             borderWidth: 2,
             pointRadius: 0,
+            pointHitRadius: 0,
             fill: false
           }
         ]
@@ -668,8 +671,8 @@ function generateHtmlReport() {
         responsive: true,
         maintainAspectRatio: false,
         interaction: {
-          mode: 'index',
-          intersect: false
+          mode: 'nearest',
+          intersect: true
         },
         plugins: {
           legend: { display: false },
@@ -688,7 +691,12 @@ function generateHtmlReport() {
                 chart.canvas.parentNode.appendChild(tooltipEl);
               }
 
-              if (tooltip.opacity === 0) {
+              // 只在精確懸浮於實際走勢資料點上才觸發顯示，避免移經空白區域跳出視窗
+              if (tooltip.opacity === 0 || !tooltip.dataPoints || tooltip.dataPoints.length === 0) {
+                tooltipEl.style.opacity = '0';
+                return;
+              }
+              if (tooltip.dataPoints[0].datasetIndex !== 0) {
                 tooltipEl.style.opacity = '0';
                 return;
               }
