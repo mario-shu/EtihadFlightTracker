@@ -688,7 +688,7 @@ function generateHtmlReport() {
               if (!tooltipEl) {
                 tooltipEl = document.createElement('div');
                 tooltipEl.id = 'chartCustomTooltip';
-                tooltipEl.className = 'absolute pointer-events-none transition-all duration-100 z-30 rounded-xl p-3 shadow-2xl border border-slate-700/80 text-xs text-slate-200 min-w-[240px]';
+                tooltipEl.className = 'absolute pointer-events-none transition-all duration-100 z-30 rounded-xl p-2.5 sm:p-3 shadow-2xl border border-slate-700/80 text-xs text-slate-200 min-w-[190px] sm:min-w-[240px]';
                 tooltipEl.style.backgroundColor = 'rgba(15, 23, 42, 0.95)';
                 tooltipEl.style.backdropFilter = 'blur(10px)';
                 chart.canvas.parentNode.style.position = 'relative';
@@ -742,7 +742,7 @@ function generateHtmlReport() {
               tooltipEl.innerHTML = [
                 '<div class="font-bold text-slate-100 mb-2 pb-1.5 border-b border-slate-700/70 flex items-center justify-between gap-3">',
                 '  <span class="font-mono text-xs">📅 ' + dateLabel + '</span>',
-                '  <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 font-semibold">實際追蹤</span>',
+                '  <span class="hidden sm:inline-block text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 font-semibold">實際追蹤</span>',
                 '</div>',
                 '<div class="space-y-1.5">',
                 '  <div class="flex items-center justify-between gap-3">',
@@ -760,35 +760,51 @@ function generateHtmlReport() {
                 '    <span>較目前平均:</span>',
                 '    ' + avgHtml,
                 '  </div>',
-                '  <div class="pt-1.5 mt-1 border-t border-slate-800/80 flex items-center justify-between gap-3 text-slate-400 text-[11px]">',
-                '    <span class="flex items-center gap-1 text-sky-400">',
-                '      <span class="w-3 h-0.5 bg-sky-400 inline-block border-t border-dashed border-sky-400"></span>',
-                '      追蹤平均線:',
-                '    </span>',
-                '    <span class="font-mono text-sky-300 font-semibold">NT$ ' + avg.toLocaleString() + '</span>',
-                '  </div>',
-                '  <div class="flex items-center justify-between gap-3 text-slate-400 text-[11px]">',
-                '    <span class="flex items-center gap-1 text-slate-400">',
-                '      <span class="w-3 h-0.5 bg-slate-400 inline-block border-t border-dashed border-slate-400"></span>',
-                '      初始基準線:',
-                '    </span>',
-                '    <span class="font-mono text-slate-300">NT$ ' + baseline.toLocaleString() + '</span>',
+                '  <div class="hidden sm:block pt-1.5 mt-1 border-t border-slate-800/80 space-y-1.5 text-slate-400 text-[11px]">',
+                '    <div class="flex items-center justify-between gap-3">',
+                '      <span class="flex items-center gap-1 text-sky-400">',
+                '        <span class="w-3 h-0.5 bg-sky-400 inline-block border-t border-dashed border-sky-400"></span>',
+                '        追蹤平均線:',
+                '      </span>',
+                '      <span class="font-mono text-sky-300 font-semibold">NT$ ' + avg.toLocaleString() + '</span>',
+                '    </div>',
+                '    <div class="flex items-center justify-between gap-3">',
+                '      <span class="flex items-center gap-1 text-slate-400">',
+                '        <span class="w-3 h-0.5 bg-slate-400 inline-block border-t border-dashed border-slate-400"></span>',
+                '        初始基準線:',
+                '      </span>',
+                '      <span class="font-mono text-slate-300">NT$ ' + baseline.toLocaleString() + '</span>',
+                '    </div>',
                 '  </div>',
                 '</div>'
               ].join('');
 
               tooltipEl.style.opacity = '1';
 
-              // 邊界防溢出定位
-              const isRightSide = tooltip.caretX > (chart.width * 0.55);
-              if (isRightSide) {
-                tooltipEl.style.left = (tooltip.caretX - 12) + 'px';
-                tooltipEl.style.transform = 'translate(-100%, -50%)';
+              // 響應式邊界防溢出與定位
+              const isMobile = window.innerWidth < 640;
+              if (isMobile) {
+                // 手機版：輕量卡片，避開手指點擊遮蔽並鎖在畫布內
+                const clampedX = Math.max(8, Math.min(chart.width - 200, tooltip.caretX - 95));
+                tooltipEl.style.left = clampedX + 'px';
+                tooltipEl.style.transform = 'none';
+                if (tooltip.caretY > 115) {
+                  tooltipEl.style.top = (tooltip.caretY - 110) + 'px';
+                } else {
+                  tooltipEl.style.top = (tooltip.caretY + 18) + 'px';
+                }
               } else {
-                tooltipEl.style.left = (tooltip.caretX + 12) + 'px';
-                tooltipEl.style.transform = 'translate(0, -50%)';
+                // 電腦版：左右智慧側向彈出
+                const isRightSide = tooltip.caretX > (chart.width * 0.55);
+                if (isRightSide) {
+                  tooltipEl.style.left = (tooltip.caretX - 12) + 'px';
+                  tooltipEl.style.transform = 'translate(-100%, -50%)';
+                } else {
+                  tooltipEl.style.left = (tooltip.caretX + 12) + 'px';
+                  tooltipEl.style.transform = 'translate(0, -50%)';
+                }
+                tooltipEl.style.top = Math.max(16, Math.min(chart.height - 16, tooltip.caretY)) + 'px';
               }
-              tooltipEl.style.top = Math.max(16, Math.min(chart.height - 16, tooltip.caretY)) + 'px';
             }
           }
         },
