@@ -126,9 +126,25 @@ async function runTracker() {
       await page.waitForTimeout(1000);
       try {
         const domPrice = await page.evaluate(() => {
-          const text = document.body ? document.body.innerText : '';
-          const match = text.match(/\$([0-9]{1,3},[0-9]{3})/);
-          return match ? parseInt(match[1].replace(/,/g, ''), 10) : null;
+          const listItems = Array.from(document.querySelectorAll('li, div[role="listitem"], .pIav4d, .yR1fYc, .JMc5Xc'));
+          for (const item of listItems) {
+            const text = item.innerText || '';
+            if ((text.includes('18 小時 20 分鐘') || text.includes('19:40') || text.includes('晚上7:40')) && text.includes('$')) {
+              const match = text.match(/\$([0-9]{1,3},[0-9]{3})/);
+              if (match) {
+                return parseInt(match[1].replace(/,/g, ''), 10);
+              }
+            }
+          }
+          const bodyText = document.body ? document.body.innerText : '';
+          const matches = bodyText.match(/\$([0-9]{1,3},[0-9]{3})/g);
+          if (matches && matches.length > 0) {
+            const nums = matches.map(m => parseInt(m.replace(/[^0-9]/g, ''), 10));
+            const valid = nums.filter(n => n >= 100000 && n <= 160000);
+            if (valid.length > 0) return Math.min(...valid);
+            return nums[0];
+          }
+          return null;
         });
         if (domPrice) {
           liveFetchedPrice = domPrice;
