@@ -85,7 +85,7 @@
                 <span>最近一次更新：</span>
               </span>
               <span id="lastUpdatedText" class="font-mono text-slate-100 bg-slate-800/90 px-2.5 py-0.5 rounded border border-slate-700 font-bold text-sm">
-                2026-11-06 19:59:37
+                2026-11-07 07:55:51
               </span>
             </div>
           </div>
@@ -111,14 +111,14 @@
       <div class="glass-card rounded-2xl p-5 relative overflow-hidden">
         <div class="text-sm uppercase tracking-wider text-slate-300 font-semibold mb-1">當前最新總票價 (含稅・經濟艙 Value)</div>
         <div class="text-3xl font-black text-amber-300">
-          NT$ 134,266
+          NT$ 134,506
         </div>
         <div class="mt-2 flex items-center gap-1.5 text-sm font-semibold text-rose-400">
-          <span>▲ 漲 NT$ 716</span>
-          <span>(+0.5% 相比基準)</span>
+          <span>▲ 漲 NT$ 956</span>
+          <span>(+0.7% 相比基準)</span>
         </div>
         <div class="mt-1 text-xs text-slate-400">
-          Basic 基礎 NT$ 128,933 + Value 升等 NT$ 5,333 | 人均約 NT$ 33,566.5
+          Basic 基礎 NT$ 129,173 + Value 升等 NT$ 5,333 | 人均約 NT$ 33,626.5
         </div>
       </div>
 
@@ -143,7 +143,7 @@
         <div class="mt-2 text-sm text-emerald-300/90 flex items-center gap-1 font-semibold">
           <span>歷史波段低檔</span>
         </div>
-        <div class="mt-1 text-xs text-slate-400">歷史最高：NT$ 134,266</div>
+        <div class="mt-1 text-xs text-slate-400">歷史最高：NT$ 134,506</div>
       </div>
 
       <!-- 出發倒數與天數 -->
@@ -185,7 +185,7 @@
           <span>9/11 曾出現過 TWD 119,541 的真實波段低點（每人約 NT$ 29,885.25）。</span>
         </div><div class="flex items-start gap-3">
           <span class="text-amber-400 font-bold text-lg">•</span>
-          <span>目前 11/02 報價為 TWD 134,266，相比 9 月低點上漲了 NT$ 14,725 (+12.3%)。</span>
+          <span>目前 11/02 報價為 TWD 134,506，相比 9 月低點上漲了 NT$ 14,965 (+12.5%)。</span>
         </div><div class="flex items-start gap-3">
           <span class="text-amber-400 font-bold text-lg">•</span>
           <span>歷史證明該航班組合「確實有跌破 12 萬的實績」，不建議在目前 13.3 萬的相對高檔追買，建議等待回檔至 TWD 125,000 以下。</span>
@@ -409,7 +409,7 @@
             </div>
             <div class="flex items-center gap-1.5 text-sky-400">
               <span class="w-3.5 h-0.5 bg-sky-400 inline-block border-t border-dashed border-sky-400"></span>
-              <span>追蹤平均線 (<span id="avgLegendText">NT$ 133,858</span>)</span>
+              <span>追蹤平均線 (<span id="avgLegendText">NT$ 133,930</span>)</span>
             </div>
             <div class="flex items-center gap-1.5 text-slate-300">
               <span class="w-3.5 h-0.5 bg-slate-400 inline-block border-t border-dashed border-slate-400"></span>
@@ -440,6 +440,21 @@
           </thead>
           <tbody class="divide-y divide-slate-800">
             
+              <tr class="hover:bg-slate-800/40 transition-colors">
+                <td class="py-3 px-4 font-mono text-sm text-slate-300">2026-11-07 07:55:51</td>
+                <td class="py-3 px-4 font-bold text-amber-300 text-lg">NT$ 134,506</td>
+                <td class="py-3 px-4 text-slate-200 text-sm">NT$ 33,626.5</td>
+                <td class="py-3 px-4 font-semibold text-sm text-rose-400">
+                  ▲ +NT$ 956
+                </td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    Verified
+                  </span>
+                </td>
+                <td class="py-3 px-4 text-sm text-slate-300">系統即時抓取 (Basic NT$ 129,173 + Value 升等 NT$ 5,333 = Value 總價 NT$ 134,506)</td>
+              </tr>
+              
               <tr class="hover:bg-slate-800/40 transition-colors">
                 <td class="py-3 px-4 font-mono text-sm text-slate-300">2026-11-06 19:59:37</td>
                 <td class="py-3 px-4 font-bold text-amber-300 text-lg">NT$ 134,266</td>
@@ -592,19 +607,19 @@
     // 渲染 Chart.js (支援近期追蹤與全部走勢切換)
     const chartDataSets = {
       recent: {
-        labels: ["2026-11-02 11:03","2026-11-02 13:31","2026-11-03 09:35","2026-11-04 09:32","2026-11-04 22:27","2026-11-05 11:11","2026-11-06 07:52","2026-11-06 19:59"],
-        prices: [133550,133550,133738,133714,133714,134062,134266,134266],
-        baselines: [133550,133550,133550,133550,133550,133550,133550,133550],
-        averages: [133858,133858,133858,133858,133858,133858,133858,133858],
-        avgPrice: 133858,
+        labels: ["2026-11-02 11:03","2026-11-02 13:31","2026-11-03 09:35","2026-11-04 09:32","2026-11-04 22:27","2026-11-05 11:11","2026-11-06 07:52","2026-11-06 19:59","2026-11-07 07:55"],
+        prices: [133550,133550,133738,133714,133714,134062,134266,134266,134506],
+        baselines: [133550,133550,133550,133550,133550,133550,133550,133550,133550],
+        averages: [133930,133930,133930,133930,133930,133930,133930,133930,133930],
+        avgPrice: 133930,
         badge: '近期每日追蹤'
       },
       all: {
-        labels: ["2026-09-11 09:00","2026-11-02 11:03","2026-11-02 13:31","2026-11-03 09:35","2026-11-04 09:32","2026-11-04 22:27","2026-11-05 11:11","2026-11-06 07:52","2026-11-06 19:59"],
-        prices: [119541,133550,133550,133738,133714,133714,134062,134266,134266],
-        baselines: [133550,133550,133550,133550,133550,133550,133550,133550,133550],
-        averages: [132267,132267,132267,132267,132267,132267,132267,132267,132267],
-        avgPrice: 132267,
+        labels: ["2026-09-11 09:00","2026-11-02 11:03","2026-11-02 13:31","2026-11-03 09:35","2026-11-04 09:32","2026-11-04 22:27","2026-11-05 11:11","2026-11-06 07:52","2026-11-06 19:59","2026-11-07 07:55"],
+        prices: [119541,133550,133550,133738,133714,133714,134062,134266,134266,134506],
+        baselines: [133550,133550,133550,133550,133550,133550,133550,133550,133550,133550],
+        averages: [132491,132491,132491,132491,132491,132491,132491,132491,132491,132491],
+        avgPrice: 132491,
         badge: '全部紀錄 (含9/11低點)'
       }
     };
