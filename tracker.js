@@ -119,9 +119,9 @@ async function runTracker() {
     console.log('   正在連線 Google Flights 查詢網址...');
     await page.goto(searchUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
-    // 輪詢等待價格出現 (同時支援 API 攔截與 DOM 渲染，最多等待 20 秒)
+    // 輪詢等待價格出現 (同時支援 API 攔截與 DOM 渲染，最多等待 30 秒)
     console.log('   正在等待 Google Flights 計算並載入即時航班票價...');
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 30; i++) {
       if (liveFetchedPrice) break;
       await page.waitForTimeout(1000);
       try {
@@ -279,8 +279,25 @@ async function runTracker() {
   }
 }
 
+async function runTrackerWithRetry(maxRetries = 3) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    console.log(`\n====================================================`);
+    console.log(`[${new Date().toLocaleString()}] 啟動阿提哈德機票追蹤 (第 ${attempt}/${maxRetries} 次嘗試)...`);
+    console.log(`====================================================`);
+    const result = await runTracker();
+    if (result && result.success) {
+      return result;
+    }
+    if (attempt < maxRetries) {
+      console.log(`⚠️ 第 ${attempt} 次抓取未能成功取得票價，等待 6 秒後進行第 ${attempt + 1} 次重試...`);
+      await new Promise(r => setTimeout(r, 6000));
+    }
+  }
+  return { success: false, error: `已重試 ${maxRetries} 次均未能取得有效票價` };
+}
+
 if (require.main === module) {
-  runTracker().then(res => {
+  runTrackerWithRetry(3).then(res => {
     if (!res || !res.success) {
       process.exit(1);
     }
@@ -289,4 +306,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { runTracker };
+module.exports = { runTracker, runTrackerWithRetry };
