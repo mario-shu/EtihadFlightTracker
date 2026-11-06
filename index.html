@@ -85,7 +85,7 @@
                 <span>最近一次更新：</span>
               </span>
               <span id="lastUpdatedText" class="font-mono text-slate-100 bg-slate-800/90 px-2.5 py-0.5 rounded border border-slate-700 font-bold text-sm">
-                2026-11-06 07:52:26
+                2026-11-06 19:59:37
               </span>
             </div>
           </div>
@@ -150,7 +150,7 @@
       <div class="glass-card rounded-2xl p-5">
         <div class="text-sm uppercase tracking-wider text-slate-300 font-semibold mb-1">距離出發 (2027/07/01)</div>
         <div class="text-3xl font-black text-blue-300">
-          238 <span class="text-lg font-bold text-slate-400">天</span>
+          237 <span class="text-lg font-bold text-slate-400">天</span>
         </div>
         <div class="mt-2 text-sm text-blue-400/90 font-semibold flex items-center gap-1">
           <span>暑期大旺季航檔</span>
@@ -191,7 +191,7 @@
           <span>歷史證明該航班組合「確實有跌破 12 萬的實績」，不建議在目前 13.3 萬的相對高檔追買，建議等待回檔至 TWD 125,000 以下。</span>
         </div><div class="flex items-start gap-3">
           <span class="text-amber-400 font-bold text-lg">•</span>
-          <span>距離 2027 年 7 月暑假出發尚有約 238 天。歐洲暑期長程線在出發前 5～7 個月（約 2026 年底至 2027 年初）通常會有航司的跨年或春季早鳥促銷檔期，有很大機會再次出現低於 12.5 萬的好價。</span>
+          <span>距離 2027 年 7 月暑假出發尚有約 237 天。歐洲暑期長程線在出發前 5～7 個月（約 2026 年底至 2027 年初）通常會有航司的跨年或春季早鳥促銷檔期，有很大機會再次出現低於 12.5 萬的好價。</span>
         </div>
       </div>
     </section>
@@ -409,7 +409,7 @@
             </div>
             <div class="flex items-center gap-1.5 text-sky-400">
               <span class="w-3.5 h-0.5 bg-sky-400 inline-block border-t border-dashed border-sky-400"></span>
-              <span>追蹤平均線 (<span id="avgLegendText">NT$ 133,799</span>)</span>
+              <span>追蹤平均線 (<span id="avgLegendText">NT$ 133,858</span>)</span>
             </div>
             <div class="flex items-center gap-1.5 text-slate-300">
               <span class="w-3.5 h-0.5 bg-slate-400 inline-block border-t border-dashed border-slate-400"></span>
@@ -440,6 +440,21 @@
           </thead>
           <tbody class="divide-y divide-slate-800">
             
+              <tr class="hover:bg-slate-800/40 transition-colors">
+                <td class="py-3 px-4 font-mono text-sm text-slate-300">2026-11-06 19:59:37</td>
+                <td class="py-3 px-4 font-bold text-amber-300 text-lg">NT$ 134,266</td>
+                <td class="py-3 px-4 text-slate-200 text-sm">NT$ 33,566.5</td>
+                <td class="py-3 px-4 font-semibold text-sm text-rose-400">
+                  ▲ +NT$ 716
+                </td>
+                <td class="py-3 px-4">
+                  <span class="px-2.5 py-1 rounded text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    Verified
+                  </span>
+                </td>
+                <td class="py-3 px-4 text-sm text-slate-300">系統即時抓取 (Basic NT$ 128,933 + Value 升等 NT$ 5,333 = Value 總價 NT$ 134,266)</td>
+              </tr>
+              
               <tr class="hover:bg-slate-800/40 transition-colors">
                 <td class="py-3 px-4 font-mono text-sm text-slate-300">2026-11-06 07:52:26</td>
                 <td class="py-3 px-4 font-bold text-amber-300 text-lg">NT$ 134,266</td>
@@ -577,19 +592,19 @@
     // 渲染 Chart.js (支援近期追蹤與全部走勢切換)
     const chartDataSets = {
       recent: {
-        labels: ["2026-11-02 11:03","2026-11-02 13:31","2026-11-03 09:35","2026-11-04 09:32","2026-11-04 22:27","2026-11-05 11:11","2026-11-06 07:52"],
-        prices: [133550,133550,133738,133714,133714,134062,134266],
-        baselines: [133550,133550,133550,133550,133550,133550,133550],
-        averages: [133799,133799,133799,133799,133799,133799,133799],
-        avgPrice: 133799,
+        labels: ["2026-11-02 11:03","2026-11-02 13:31","2026-11-03 09:35","2026-11-04 09:32","2026-11-04 22:27","2026-11-05 11:11","2026-11-06 07:52","2026-11-06 19:59"],
+        prices: [133550,133550,133738,133714,133714,134062,134266,134266],
+        baselines: [133550,133550,133550,133550,133550,133550,133550,133550],
+        averages: [133858,133858,133858,133858,133858,133858,133858,133858],
+        avgPrice: 133858,
         badge: '近期每日追蹤'
       },
       all: {
-        labels: ["2026-09-11 09:00","2026-11-02 11:03","2026-11-02 13:31","2026-11-03 09:35","2026-11-04 09:32","2026-11-04 22:27","2026-11-05 11:11","2026-11-06 07:52"],
-        prices: [119541,133550,133550,133738,133714,133714,134062,134266],
-        baselines: [133550,133550,133550,133550,133550,133550,133550,133550],
-        averages: [132017,132017,132017,132017,132017,132017,132017,132017],
-        avgPrice: 132017,
+        labels: ["2026-09-11 09:00","2026-11-02 11:03","2026-11-02 13:31","2026-11-03 09:35","2026-11-04 09:32","2026-11-04 22:27","2026-11-05 11:11","2026-11-06 07:52","2026-11-06 19:59"],
+        prices: [119541,133550,133550,133738,133714,133714,134062,134266,134266],
+        baselines: [133550,133550,133550,133550,133550,133550,133550,133550,133550],
+        averages: [132267,132267,132267,132267,132267,132267,132267,132267,132267],
+        avgPrice: 132267,
         badge: '全部紀錄 (含9/11低點)'
       }
     };

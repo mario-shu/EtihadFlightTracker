@@ -467,5 +467,51 @@
     "status": "Verified",
     "source": "Google Flights (Live Etihad Direct)",
     "note": "系統即時抓取 (Basic NT$ 128,933 + Value 升等 NT$ 5,333 = Value 總價 NT$ 134,266)"
+  },
+  {
+    "timestamp": "2026-11-06T19:59:37+08:00",
+    "dateStr": "2026-11-06",
+    "timeStr": "19:59",
+    "totalPriceTwd": 134266,
+    "basicPriceTwd": 128933,
+    "fareUpgradeTwd": 5333,
+    "currency": "TWD",
+    "adultCount": 3,
+    "childCount": 1,
+    "averagePerPerson": 33566.5,
+    "cabinClass": "Economy",
+    "fareCategory": "Value",
+    "keyMatched": {
+      "outbound": [
+        "EY 899",
+        "EY 61"
+      ],
+      "inbound": [
+        "EY 34",
+        "EY 898"
+      ]
+    },
+    "leg1": {
+      "route": "TPE -> LHR",
+      "departure": "19:40",
+      "arrival": "07:00 (+1天)",
+      "date": "2027-07-01",
+      "transit": "1次中轉 1小時25分鐘"
+    },
+    "leg2": {
+      "route": "CDG -> TPE",
+      "departure": "21:50",
+      "arrival": "10:00 (+2天)",
+      "date": "2027-07-09",
+      "transit": "1次中轉"
+    },
+    "equipmentCheck": {
+      "isA380Confirmed": true,
+      "flagshipFlight": "EY 61",
+      "aircraft": "Airbus A380"
+    },
+    "status": "Verified",
+    "source": "Google Flights (Live Etihad Direct)",
+    "note": "系統即時抓取 (Basic NT$ 128,933 + Value 升等 NT$ 5,333 = Value 總價 NT$ 134,266)"
   }
 ]
