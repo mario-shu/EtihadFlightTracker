@@ -55,7 +55,7 @@
 ```text
 EtihadFlightTracker/
 ├── .github/workflows/
-│   └── tracker.yml        # GitHub Actions 雲端排程 (每日 07:15、19:15 自動在雲端執行)
+│   └── tracker.yml        # GitHub Actions 雲端排程 (每日上午 07:15 自動在雲端執行)
 ├── config.json            # 追蹤條件設定檔 (航線、班次號、起降時間、中轉時長、目標門檻、Value 升等價差)
 ├── history.json           # 歷次抓取歷史紀錄 (JSON 資料庫，100% 真實數據)
 ├── tracker.js             # 雲端自動抓取引擎 (Playwright + Google Flights API 攔截)
@@ -71,7 +71,7 @@ EtihadFlightTracker/
 ## 💡 雲端運作與使用方式
 
 1. **完全免開本機電腦**：
-   - GitHub Actions 每日台灣時間 **07:15** 與 **19:15** (晚上 7:15) 自動在雲端啟動虛擬機進行最新票價抓取。
+   - GitHub Actions 每日台灣時間上午 **07:15** 自動在雲端啟動虛擬機進行最新票價抓取。
    - 抓取完成後自動將最新數據寫入 `history.json` 並編譯 `index.html` 回存 GitHub。
 2. **手機外出隨身查閱**：
    - 任何裝置（手機 / 平板 / PC）直接開啟：  

@@ -253,9 +253,16 @@ async function runTracker() {
       }
     }
 
-    historyData.push(historyRecord);
+    // 檢查同一天是否已有記錄；若有則覆寫更新當天紀錄，確保一天僅一筆資料
+    const existingIndex = historyData.findIndex(item => item.dateStr === historyRecord.dateStr);
+    if (existingIndex >= 0) {
+      historyData[existingIndex] = historyRecord;
+      console.log(`ℹ️ [當日記錄更新] 覆寫 ${historyRecord.dateStr} 之紀錄為最新數據: NT$ ${liveFetchedPrice.toLocaleString()}`);
+    } else {
+      historyData.push(historyRecord);
+      console.log(`✅ [歷史記錄新增成功] 已寫入最新一筆真實數據: NT$ ${liveFetchedPrice.toLocaleString()}`);
+    }
     fs.writeFileSync(HISTORY_PATH, JSON.stringify(historyData, null, 2), 'utf8');
-    console.log(`✅ [歷史記錄更新成功] 已寫入最新一筆真實數據: NT$ ${liveFetchedPrice.toLocaleString()}`);
 
     // 5. 重新生成視覺化報表
     console.log('4. 正在更新 index.html 報表...');
