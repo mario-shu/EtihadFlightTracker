@@ -598,7 +598,7 @@ function generateHtmlReport() {
 
     <!-- 底部說明 -->
     <footer class="pt-6 border-t border-slate-800 text-center text-sm text-slate-400 space-y-1">
-      <p>🏎️ 2027 英國法國 F1 家族之旅 • 阿提哈德特定航班機票價格追蹤雷達</p>
+      <p>🏁 2027 F1 • 英國 • 法國之旅 | 阿提哈德機票價格追蹤雷達</p>
       <p>去程：EY 899 轉 EY 61 (A380) | 回程：EY 34 轉 EY 898 (阿布達比過境)</p>
     </footer>
 
