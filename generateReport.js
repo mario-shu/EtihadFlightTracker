@@ -143,7 +143,7 @@ function generateHtmlReport() {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2027 英國法國 F1 家族之旅 | 阿提哈德機票價格追蹤雷達</title>
+  <title>2027 F1 • 英國 • 法國之旅 | 阿提哈德機票價格追蹤雷達</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -199,7 +199,7 @@ function generateHtmlReport() {
         <!-- 標籤徽章列 -->
         <div class="flex items-center gap-2 flex-wrap">
           <span class="px-3 py-1 rounded-md text-xs font-extrabold bg-rose-500/20 text-rose-300 border border-rose-500/30 uppercase tracking-wider flex items-center gap-1.5">
-            <span>🏁</span> 2027 英國 • 法國 F1 家族之旅
+            <span>📡</span> 阿提哈德機票價格追蹤雷達
           </span>
           <span class="px-3 py-1 rounded-md text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1.5">
             <span>👨‍👩‍👧‍👦</span> 家庭票 (3大1小)
@@ -209,13 +209,13 @@ function generateHtmlReport() {
           </span>
         </div>
 
-        <div class="flex items-center gap-3.5">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 via-rose-500 to-amber-300 flex items-center justify-center shadow-lg shadow-rose-500/20 text-2xl flex-shrink-0">
+        <div class="flex items-center gap-4">
+          <div class="text-5xl md:text-6xl leading-none select-none flex-shrink-0 -mt-3 drop-shadow-[0_4px_14px_rgba(244,63,94,0.35)]" title="2027 F1">
             🏎️
           </div>
           <div>
             <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-amber-200 via-yellow-100 to-rose-200 bg-clip-text text-transparent">
-              阿提哈德機票價格追蹤雷達
+              2027 F1 • 英國 • 法國之旅
             </h1>
             
             <!-- 最近一次更新時間標示 -->
