@@ -5,7 +5,6 @@
 const fs = require('fs');
 const path = require('path');
 const { analyzeTrends, deduplicateDailyHistory } = require('./analyzer');
-const { createQuery, Passengers } = require('fast-flights-ts');
 
 // 統一格式化繁體中文日期 (例如 "01 7月" 轉換為 "7月1日")
 function formatDisplayDate(dateStr) {
@@ -106,27 +105,6 @@ function generateHtmlReport() {
   const leg2 = (latestRecord.leg2Details) ? latestRecord.leg2Details : config.targetFlight.legs[1];
   const equipmentCheck = latestRecord.equipmentCheck || { isA380Confirmed: true, statusLabel: "已即時比對確認：執飛機型為 A380 雙層巨無霸旗艦客機" };
   const scheduleChanges = latestRecord.scheduleChanges || [];
-
-  // 訂票比價直達連結 (Google Flights 官方直連阿提哈德航線頁面，包含4人、多停點、指定日期與班號)
-  let deepLink = 'https://www.etihad.com/zt-tw/book';
-  try {
-    const p = new Passengers({
-      adults: config.targetFlight.passengers.adults,
-      children: config.targetFlight.passengers.children
-    });
-    const q = createQuery({
-      flights: [
-        { from_airport: config.targetFlight.legs[0].origin, to_airport: config.targetFlight.legs[0].destination, date: config.targetFlight.legs[0].date, airlines: ['EY'] },
-        { from_airport: config.targetFlight.legs[1].origin, to_airport: config.targetFlight.legs[1].destination, date: config.targetFlight.legs[1].date, airlines: ['EY'] }
-      ],
-      trip: 'multi-city',
-      seat: 'economy',
-      passengers: p,
-      language: 'zh-TW',
-      currency: 'TWD'
-    });
-    deepLink = q.url();
-  } catch (e) { }
 
   // 格式化最後更新時間 (鎖定台北時區 Asia/Taipei)
   const lastUpdatedDisplay = analysis.latest.timestamp
@@ -231,16 +209,6 @@ function generateHtmlReport() {
           </div>
         </div>
 
-      </div>
-
-      <!-- 控制按鈕群 (官網比價預訂) -->
-      <div class="flex items-center gap-3 flex-wrap">
-        <!-- 官網訂票深層連結 -->
-        <a href="${deepLink}" target="_blank" rel="noopener noreferrer" 
-           class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center gap-2">
-          <span>前往官網比價預訂</span>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-        </a>
       </div>
     </header>
 
