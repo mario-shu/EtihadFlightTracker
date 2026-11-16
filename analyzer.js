@@ -2,6 +2,16 @@
  * analyzer.js - 智慧票價趨勢分析與購買建議引擎
  */
 
+function deduplicateDailyHistory(history) {
+  const sortedRaw = [...history].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+  const dailyMap = new Map();
+  for (const item of sortedRaw) {
+    const dayKey = item.dateStr || (item.timestamp ? item.timestamp.slice(0, 10) : 'unknown');
+    dailyMap.set(dayKey, item);
+  }
+  return Array.from(dailyMap.values());
+}
+
 function analyzeTrends(history, config) {
   if (!history || history.length === 0) {
     return null;
@@ -10,8 +20,8 @@ function analyzeTrends(history, config) {
   const baseline = config.targetFlight.baselinePriceTwd;
   const threshold = config.targetFlight.targetPriceThresholdTwd || 125000;
 
-  // 按照時間正序排序
-  const sorted = [...history].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+  // 按照時間正序排序，並以當天最後一筆為準
+  const sorted = deduplicateDailyHistory(history);
   const latest = sorted[sorted.length - 1];
   const previous = sorted.length > 1 ? sorted[sorted.length - 2] : latest;
 
@@ -99,4 +109,4 @@ function analyzeTrends(history, config) {
   };
 }
 
-module.exports = { analyzeTrends };
+module.exports = { analyzeTrends, deduplicateDailyHistory };

@@ -102,11 +102,14 @@ async function runTracker() {
               const innerStr = data?.[0]?.[2];
               if (innerStr && typeof innerStr === 'string') {
                 const inner = JSON.parse(innerStr);
-                // 擷取總價
+                // 擷取總價（取有效最低價，避免長轉機高價組合覆蓋黃金短轉機班次）
                 const priceMatch = innerStr.match(/\[\s*null\s*,\s*([1-9][0-9]{4,6})\s*\]/);
                 if (priceMatch) {
-                  liveFetchedPrice = parseInt(priceMatch[1], 10);
-                  console.log(`💎 [即時擷取真實含稅總票價] NT$ ${liveFetchedPrice.toLocaleString()}`);
+                  const parsedPrice = parseInt(priceMatch[1], 10);
+                  if (!liveFetchedPrice || parsedPrice < liveFetchedPrice) {
+                    liveFetchedPrice = parsedPrice;
+                    console.log(`💎 [即時擷取真實含稅總票價] NT$ ${liveFetchedPrice.toLocaleString()}`);
+                  }
                 }
                 liveFlightsInfo = inner;
               }
@@ -119,30 +122,55 @@ async function runTracker() {
     console.log('   正在連線 Google Flights 查詢網址...');
     await page.goto(searchUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
+    // 自動處理歐美雲端 IP 可能觸發的 Google GDPR Consent 同意畫面
+    try {
+      if (page.url().includes('consent.google.com')) {
+        console.log('   偵測到 Google 隱私權確認頁，嘗試自動點擊同意...');
+        const acceptBtn = await page.$('button:has-text("Accept all"), button:has-text("全部接受"), button:has-text("Reject all")');
+        if (acceptBtn) {
+          await acceptBtn.click();
+          await page.waitForTimeout(3000);
+        }
+      }
+    } catch (e) { }
+
     // 輪詢等待價格出現 (同時支援 API 攔截與 DOM 渲染，最多等待 30 秒)
     console.log('   正在等待 Google Flights 計算並載入即時航班票價...');
+    let reloadClicked = false;
     for (let i = 0; i < 30; i++) {
       if (liveFetchedPrice) break;
       await page.waitForTimeout(1000);
       try {
+        const hasError = await page.evaluate(() => {
+          const t = document.body ? document.body.innerText : '';
+          return t.includes('糟糕！系統發生錯誤') || t.includes('Something went wrong');
+        });
+        if (hasError) {
+          if (!reloadClicked) {
+            reloadClicked = true;
+            console.log('   ⚠️ 偵測到 Google Flights 暫時性載入錯誤，立即點擊「重新載入」...');
+            const reloadBtn = await page.$('button:has-text("重新載入"), button:has-text("Reload")');
+            if (reloadBtn) {
+              await reloadBtn.click();
+              continue;
+            }
+          } else if (i >= 8) {
+            console.log('   ⚠️ 重新載入後仍顯示錯誤，提前結束本輪並進入重試...');
+            break;
+          }
+        }
         const domPrice = await page.evaluate(() => {
           const listItems = Array.from(document.querySelectorAll('li, div[role="listitem"], .pIav4d, .yR1fYc, .JMc5Xc'));
           for (const item of listItems) {
             const text = item.innerText || '';
-            if ((text.includes('18 小時 20 分鐘') || text.includes('19:40') || text.includes('晚上7:40')) && text.includes('$')) {
-              const match = text.match(/\$([0-9]{1,3},[0-9]{3})/);
+            const isTargetFlight = text.includes('18 小時 20 分鐘') || text.includes('1 小時 25 分鐘') ||
+                                   text.includes('18 hr 20 min') || text.includes('1 hr 25 min');
+            if (isTargetFlight && (text.includes('$') || text.includes('TWD'))) {
+              const match = text.match(/(?:\$|NT\$|TWD\s*)([0-9]{1,3},[0-9]{3})/);
               if (match) {
                 return parseInt(match[1].replace(/,/g, ''), 10);
               }
             }
-          }
-          const bodyText = document.body ? document.body.innerText : '';
-          const matches = bodyText.match(/\$([0-9]{1,3},[0-9]{3})/g);
-          if (matches && matches.length > 0) {
-            const nums = matches.map(m => parseInt(m.replace(/[^0-9]/g, ''), 10));
-            const valid = nums.filter(n => n >= 100000 && n <= 160000);
-            if (valid.length > 0) return Math.min(...valid);
-            return nums[0];
           }
           return null;
         });
@@ -151,6 +179,18 @@ async function runTracker() {
           console.log(`💎 [DOM 成功解析即時票價] NT$ ${liveFetchedPrice.toLocaleString()}`);
           break;
         }
+      } catch (e) { }
+    }
+
+    if (!liveFetchedPrice) {
+      try {
+        const debugInfo = await page.evaluate(() => ({
+          url: window.location.href,
+          title: document.title,
+          snippet: document.body ? document.body.innerText.slice(0, 300).replace(/\n/g, ' | ') : ''
+        }));
+        console.log('   [診斷資訊] URL:', debugInfo.url, 'Title:', debugInfo.title);
+        console.log('   [診斷內文]', debugInfo.snippet);
       } catch (e) { }
     }
 
