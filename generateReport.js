@@ -233,17 +233,8 @@ function generateHtmlReport() {
 
       </div>
 
-      <!-- 控制按鈕群 (手動雲端更新 & 官網比價預訂) -->
+      <!-- 控制按鈕群 (官網比價預訂) -->
       <div class="flex items-center gap-3 flex-wrap">
-        <!-- 🔄 雲端手動更新按鈕 -->
-        <button id="cloudUpdateBtn" onclick="triggerCloudUpdate()"
-                class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 active:bg-slate-900 text-slate-200 font-semibold text-sm border border-slate-600/80 shadow-md transition-all flex items-center gap-2 group cursor-pointer">
-          <svg id="cloudUpdateIcon" class="w-4 h-4 text-amber-400 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-          </svg>
-          <span id="cloudUpdateText">手動更新</span>
-        </button>
-
         <!-- 官網訂票深層連結 -->
         <a href="${deepLink}" target="_blank" rel="noopener noreferrer" 
            class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center gap-2">
@@ -252,42 +243,6 @@ function generateHtmlReport() {
         </a>
       </div>
     </header>
-
-    <!-- 雲端更新狀態通知列 -->
-    <div id="cloudAlert" class="hidden rounded-xl p-3.5 text-sm font-semibold flex items-center justify-between gap-3 flex-wrap transition-all"></div>
-
-    <!-- GitHub Token 設定彈窗 -->
-    <div id="tokenModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div class="glass-card rounded-2xl max-w-md w-full p-6 space-y-4 border border-slate-600/60 shadow-2xl">
-        <div class="flex items-center justify-between">
-          <h3 class="text-lg font-bold text-slate-100 flex items-center gap-2">
-            <span>🔑</span> 啟用網頁一鍵手動更新
-          </h3>
-          <button onclick="closeTokenModal()" class="text-slate-400 hover:text-slate-200 text-xl leading-none">&times;</button>
-        </div>
-        <p class="text-xs text-slate-300 leading-relaxed">
-          為確保安全，GitHub Token <strong>僅儲存於您目前手機/電腦瀏覽器本機 (localStorage)</strong>，不會上傳至公開網頁。設定一次後即可在頁面上直接點擊更新！
-        </p>
-        <div class="bg-slate-900/80 border border-slate-700/80 rounded-xl p-3 text-xs text-slate-300 space-y-1">
-          <div class="font-bold text-amber-300">如何取得專用 Token (僅需 30 秒)：</div>
-          <div>1. 點此前往 <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" class="text-sky-400 underline">GitHub Fine-grained tokens ↗</a></div>
-          <div>2. Repository access 選 <strong>Only select repositories</strong> ➔ <code>EtihadFlightTracker</code></div>
-          <div>3. Permissions 展開 <strong>Actions</strong> 改為 <strong>Read and write</strong> ➔ Generate token</div>
-        </div>
-        <input id="ghTokenInput" type="password" placeholder="貼上 github_pat_... 或 ghp_..."
-               class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:border-amber-400" />
-        <div class="flex items-center justify-between gap-2 pt-1 flex-wrap">
-          <a href="https://github.com/mario-shu/EtihadFlightTracker/actions/workflows/tracker.yml" target="_blank" rel="noopener noreferrer"
-             class="text-xs text-sky-400 hover:text-sky-300 underline">
-            不想設 Token？直接前往 GitHub 頁面執行 ↗
-          </a>
-          <div class="flex items-center gap-2">
-            <button onclick="closeTokenModal()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold">取消</button>
-            <button onclick="saveTokenAndRun()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold shadow">儲存並立即更新</button>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- KPI 統計摘要卡片群 -->
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -901,127 +856,6 @@ function generateHtmlReport() {
       }
       if (badge) badge.textContent = target.badge;
       if (avgLegend) avgLegend.textContent = 'NT$ ' + target.avgPrice.toLocaleString();
-    }
-
-    // 雲端手動更新 (透過 GitHub Actions API 觸發 workflow_dispatch)
-    const GH_REPO = 'mario-shu/EtihadFlightTracker';
-    const GH_WORKFLOW = 'tracker.yml';
-    const TOKEN_KEY = 'etihad_tracker_gh_token';
-
-    function closeTokenModal() {
-      document.getElementById('tokenModal').classList.add('hidden');
-    }
-
-    function saveTokenAndRun() {
-      const val = document.getElementById('ghTokenInput').value.trim();
-      if (!val) return;
-      localStorage.setItem(TOKEN_KEY, val);
-      closeTokenModal();
-      triggerCloudUpdate();
-    }
-
-    function setCloudAlert(type, htmlContent) {
-      const alertBox = document.getElementById('cloudAlert');
-      const styles = {
-        info: 'bg-amber-500/10 border border-amber-500/30 text-amber-300',
-        success: 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-300',
-        error: 'bg-rose-500/10 border border-rose-500/30 text-rose-300'
-      };
-      alertBox.className = 'rounded-xl p-3.5 text-xs font-semibold flex items-center justify-between gap-3 flex-wrap transition-all ' + (styles[type] || styles.info);
-      alertBox.innerHTML = htmlContent;
-      alertBox.classList.remove('hidden');
-    }
-
-    async function triggerCloudUpdate() {
-      const token = localStorage.getItem(TOKEN_KEY);
-      if (!token) {
-        document.getElementById('tokenModal').classList.remove('hidden');
-        return;
-      }
-
-      const btn = document.getElementById('cloudUpdateBtn');
-      const icon = document.getElementById('cloudUpdateIcon');
-      const text = document.getElementById('cloudUpdateText');
-
-      btn.disabled = true;
-      icon.classList.add('animate-spin-fast');
-      text.innerText = '觸發中...';
-      setCloudAlert('info', '<span>⏳ 正在向 GitHub Actions 發送手動抓取指令...</span>');
-
-      try {
-        const res = await fetch(\`https://api.github.com/repos/\${GH_REPO}/actions/workflows/\${GH_WORKFLOW}/dispatches\`, {
-          method: 'POST',
-          headers: {
-            'Authorization': 'Bearer ' + token,
-            'Accept': 'application/vnd.github+json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ ref: 'main' })
-        });
-
-        if (res.status === 401 || res.status === 403) {
-          localStorage.removeItem(TOKEN_KEY);
-          setCloudAlert('error', '<span>❌ Token 無效或權限不足 (需 Actions: Read and write)，請重新設定。</span>');
-          btn.disabled = false;
-          icon.classList.remove('animate-spin-fast');
-          text.innerText = '手動更新';
-          document.getElementById('tokenModal').classList.remove('hidden');
-          return;
-        }
-
-        if (!res.ok) {
-          throw new Error('HTTP ' + res.status);
-        }
-
-        text.innerText = '雲端執行中...';
-        setCloudAlert('info', '<span>🚀 已成功觸發雲端即時抓取！GitHub 正在執行比價並自動部署網頁（約需 45 ~ 75 秒），請稍候...</span><a href="https://github.com/' + GH_REPO + '/actions" target="_blank" class="underline text-sky-400">查看即時進度 ↗</a>');
-
-        // 輪詢追蹤執行狀態，完成後自動刷新
-        let checks = 0;
-        const dispatchTime = Date.now() - 5000;
-        const timer = setInterval(async () => {
-          checks++;
-          if (checks > 24) { // 最多等待約 2 分鐘
-            clearInterval(timer);
-            setCloudAlert('info', '<span>⏱️ 雲端仍在處理或部署中，請稍候手動重新整理頁面查看最新結果。</span><button onclick="window.location.reload()" class="px-3 py-1 rounded-lg bg-amber-500 text-slate-950 font-bold">立即重新整理</button>');
-            btn.disabled = false;
-            icon.classList.remove('animate-spin-fast');
-            text.innerText = '手動更新';
-            return;
-          }
-          try {
-            const runsRes = await fetch(\`https://api.github.com/repos/\${GH_REPO}/actions/runs?event=workflow_dispatch&per_page=3\`, {
-              headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' }
-            });
-            if (runsRes.ok) {
-              const runsData = await runsRes.json();
-              const latestRun = (runsData.workflow_runs || []).find(r => new Date(r.created_at).getTime() >= dispatchTime);
-              if (latestRun) {
-                if (latestRun.status === 'completed') {
-                  clearInterval(timer);
-                  if (latestRun.conclusion === 'success') {
-                    setCloudAlert('success', '<span>✅ 雲端抓價成功！正等待 GitHub Pages 部署完成（約 15 秒後自動刷新）...</span>');
-                    setTimeout(() => window.location.reload(), 15000);
-                  } else {
-                    setCloudAlert('error', '<span>❌ 雲端抓取任務失敗，請點右側查看日誌。</span><a href="' + latestRun.html_url + '" target="_blank" class="underline text-sky-400">查看錯誤日誌 ↗</a>');
-                    btn.disabled = false;
-                    icon.classList.remove('animate-spin-fast');
-                    text.innerText = '手動更新';
-                  }
-                } else {
-                  setCloudAlert('info', '<span>⚙️ 雲端抓取任務進行中（狀態：' + latestRun.status + '），完成後將自動刷新網頁...</span><a href="' + latestRun.html_url + '" target="_blank" class="underline text-sky-400">查看即時進度 ↗</a>');
-                }
-              }
-            }
-          } catch (e) { }
-        }, 5000);
-
-      } catch (err) {
-        setCloudAlert('error', '<span>❌ 觸發失敗：' + err.message + '</span><a href="https://github.com/' + GH_REPO + '/actions/workflows/' + GH_WORKFLOW + '" target="_blank" class="underline text-sky-400">改由 GitHub 網頁手動執行 ↗</a>');
-        btn.disabled = false;
-        icon.classList.remove('animate-spin-fast');
-        text.innerText = '手動更新';
-      }
     }
   </script>
 </body>
